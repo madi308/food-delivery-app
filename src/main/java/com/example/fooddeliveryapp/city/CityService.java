@@ -17,12 +17,21 @@ public class CityService {
         this.cityRepository = cityRepository;
     }
 
+    /**
+     * Gets city from the repository by name.
+     * @param cityName Name of the city.
+     * @return City object.
+     */
     public City getCityByName(String cityName) {
         Optional<City> optionalCity = cityRepository.findCityByName(cityName);
         if (optionalCity.isEmpty()) throw new CityNotFoundException("Could not find a city with given name");
         return optionalCity.get();
     }
 
+    /**
+     * Gets all cities.
+     * @return List of City objects.
+     */
     public List<City> getAllCities() {
         return cityRepository.findAll();
     }

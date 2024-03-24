@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles custom exceptions. New custom exceptions should be added to the @ExceptionHandler.
+     * @param exception The exception to be handled.
+     * @return JSON response containing the exception's message.
+     */
     @ExceptionHandler (value = { NoObservationFoundException.class, UnsupportedVehicleException.class, CityNotFoundException.class })
     public ResponseEntity<Object> handleCustomExcpetions(RuntimeException exception) {
         return ResponseEntity

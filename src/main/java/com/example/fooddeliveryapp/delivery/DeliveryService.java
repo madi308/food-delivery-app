@@ -20,16 +20,37 @@ public class DeliveryService {
         this.cityService = cityService;
     }
 
+    /**
+     * Calculates the delivery fee based on regional base fees and fees based on weather conditions.
+     * @param cityName Name of the city.
+     * @param vehicle Vehicle type.
+     * @return Delivery fee.
+     */
     public double getDeliveryFee(String cityName, String vehicle) {
         City city = cityService.getCityByName(cityName);
         Observation observation = observationService.getLatestObservation(city.getStationName());
-        double RBF;
-        RBF = switch (vehicle.toLowerCase()) {
+
+        double RBF = getRBF(city, vehicle);
+
+        double[] ATEFandWPEF = getATEFandWPEF(vehicle, observation);
+        double ATEF = ATEFandWPEF[0];
+        double WPEF = ATEFandWPEF[1];
+
+        double WSEF = getWSEF(vehicle, observation);
+
+        return RBF + ATEF + WSEF + WPEF;
+    }
+
+    private static double getRBF(City city, String vehicle) {
+        return switch (vehicle.toLowerCase()) {
             case "car" -> city.getCarRBF();
             case "scooter" -> city.getScooterRBF();
             case "bike" -> city.getBikeRBF();
             default -> throw new UnsupportedVehicleException("Vehicle not found");
         };
+    }
+
+    private static double[] getATEFandWPEF(String vehicle, Observation observation) {
         double ATEF = 0;
         double WPEF = 0;
         if (vehicle.equalsIgnoreCase("scooter") || vehicle.equalsIgnoreCase("bike")) {
@@ -47,15 +68,17 @@ public class DeliveryService {
             if (phenomenon.contains("glaze") || phenomenon.contains("hail") || phenomenon.contains("thunder"))
                 throw new UnsupportedVehicleException("Usage of selected vehicle type is forbidden");
         }
-        double WSEF = 0;
+        return new double[]{ATEF, WPEF};
+    }
+
+    private static double getWSEF(String vehicle, Observation observation) {
         if (vehicle.equalsIgnoreCase("bike")) {
             double windSpeed = observation.getWindspeed();
             if (windSpeed > 20)
                 throw new UnsupportedVehicleException("Usage of selected vehicle type is forbidden");
             if (windSpeed >= 10)
-                WSEF = 0.5;
+                return 0.5;
         }
-        return RBF + ATEF + WSEF + WPEF;
+        return 0;
     }
-
 }

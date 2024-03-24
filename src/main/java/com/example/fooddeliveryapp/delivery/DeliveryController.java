@@ -20,15 +20,15 @@ public class DeliveryController {
         this.deliveryService = deliveryService;
     }
 
-
-    /*@GetMapping(path = "/{location}/{vehicle}")
-    public double getDeliveryFee(@PathVariable String location, @PathVariable String vehicle) {
-        return deliveryService.getDeliveryFee(location, vehicle);
-    }*/
-
+    /**
+     * Delivery fee endpoint.
+     * Returns delivery fee using DeliveryService.
+     * @param location Name of the city.
+     * @param vehicle Vehicle type.
+     * @return Delivery fee.
+     */
     @GetMapping(path = "/{location}/{vehicle}")
     public ResponseEntity<Object> getDeliveryFee(@PathVariable String location, @PathVariable String vehicle) {
-        //return deliveryService.getDeliveryFee(location, vehicle);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")

@@ -77,6 +77,11 @@ public class ObservationService {
         }
     }
 
+    /**
+     * Gets the latest observation in given station.
+     * @param stationName Name of the weather station.
+     * @return Observation object.
+     */
     public Observation getLatestObservation(String stationName) {
         Optional<Observation> optionalObservation = observationRepository.findLatestByName(stationName);
         if (optionalObservation.isEmpty()) throw new NoObservationFoundException("No observations with specified location found");
