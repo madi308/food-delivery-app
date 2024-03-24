@@ -23,7 +23,7 @@ public class CityService {
      * @return City object.
      */
     public City getCityByName(String cityName) {
-        Optional<City> optionalCity = cityRepository.findCityByName(cityName);
+        Optional<City> optionalCity = cityRepository.findById(cityName.toLowerCase());
         if (optionalCity.isEmpty()) throw new CityNotFoundException("Could not find a city with given name");
         return optionalCity.get();
     }
