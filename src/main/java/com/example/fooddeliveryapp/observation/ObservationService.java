@@ -35,6 +35,9 @@ public class ObservationService {
         this.cityService = cityService;
     }
 
+    /**
+     * A cron job that runs every hour on the 15th minute and fetches new observations for all cities.
+     */
     @Scheduled(cron = "0 15 * * * *")
     private void addNewObservations() {
 
@@ -42,6 +45,7 @@ public class ObservationService {
         if (cities.isEmpty())
             return;
         try {
+            //Gets XML from the URL specified above.
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             URLConnection urlConnection = new URL(OBSERVATIONS_URL).openConnection();
@@ -49,22 +53,28 @@ public class ObservationService {
             Document doc = db.parse(urlConnection.getInputStream());
             doc.getDocumentElement().normalize();
 
+            //Gets timestamp and a list of stations.
             long timestamp = Long.parseLong(doc.getDocumentElement().getAttribute("timestamp"));
             NodeList stations = doc.getElementsByTagName("station");
             int counter = 0;
             int citiesLength = cities.size();
             Set<String> stationNames = cities.stream().map(City::getStationName).collect(Collectors.toSet());
 
+            //Goes through all stations and creates new Observation objects for the stations, we are interested in.
             for (int i = 0; i < stations.getLength(); i++) {
                 if (counter == citiesLength)
                     break;
                 Element station = (Element) stations.item(i);
                 String name = station.getElementsByTagName("name").item(0).getTextContent();
                 if (stationNames.contains(name)) {
-                    int wmocode = Integer.parseInt(station.getElementsByTagName("wmocode").item(0).getTextContent());
-                    float airtemperature = Float.parseFloat(station.getElementsByTagName("airtemperature").item(0).getTextContent());
-                    float windspeed = Float.parseFloat(station.getElementsByTagName("windspeed").item(0).getTextContent());
-                    String phenomenon = station.getElementsByTagName("phenomenon").item(0).getTextContent();
+                    int wmocode = Integer.parseInt(station.getElementsByTagName("wmocode")
+                            .item(0).getTextContent());
+                    float airtemperature = Float.parseFloat(station.getElementsByTagName("airtemperature")
+                            .item(0).getTextContent());
+                    float windspeed = Float.parseFloat(station.getElementsByTagName("windspeed")
+                            .item(0).getTextContent());
+                    String phenomenon = station.getElementsByTagName("phenomenon")
+                            .item(0).getTextContent();
                     observationRepository.save(new Observation(
                             name, wmocode, airtemperature, windspeed, phenomenon, timestamp
                     ));
@@ -78,13 +88,14 @@ public class ObservationService {
     }
 
     /**
-     * Gets the latest observation in given station.
+     * Gets the latest observation in a given station.
      * @param stationName Name of the weather station.
      * @return Observation object.
      */
     public Observation getLatestObservation(String stationName) {
         Optional<Observation> optionalObservation = observationRepository.findLatestByName(stationName);
-        if (optionalObservation.isEmpty()) throw new NoObservationFoundException("No observations with specified location found");
+        if (optionalObservation.isEmpty())
+            throw new NoObservationFoundException("No observations with specified location found");
         return optionalObservation.get();
     }
 }
