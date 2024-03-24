@@ -1,6 +1,8 @@
 package com.example.fooddeliveryapp.city;
 
 import com.example.fooddeliveryapp.exception.CityNotFoundException;
+import com.example.fooddeliveryapp.exception.NotAFloatException;
+import com.example.fooddeliveryapp.exception.UnsupportedVehicleException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +36,29 @@ public class CityService {
      */
     public List<City> getAllCities() {
         return cityRepository.findAll();
+    }
+
+    /**
+     * Updates RBF for the specified city.
+     * @param cityName The name of the city to be updated.
+     * @param vehicle The vehicle type.
+     * @param newRBF New RBF value.
+     */
+    public void updateRBF(String cityName, String vehicle, String newRBF) {
+        City city = getCityByName(cityName);
+        float floatRBF;
+        try {
+            floatRBF = Float.parseFloat(newRBF);
+        } catch (NumberFormatException | NullPointerException e) {
+            throw new NotAFloatException("The inserted RBF value is not a float");
+        }
+
+        switch (vehicle.toLowerCase()) {
+            case "car" -> city.setCarRBF(floatRBF);
+            case "scooter" -> city.setScooterRBF(floatRBF);
+            case "bike" -> city.setBikeRBF(floatRBF);
+            default -> throw new UnsupportedVehicleException("Vehicle not found");
+        };
+        cityRepository.save(city);
     }
 }

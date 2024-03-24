@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
      * @param exception The exception to be handled.
      * @return JSON response containing the exception's message.
      */
-    @ExceptionHandler (value = { NoObservationFoundException.class, UnsupportedVehicleException.class, CityNotFoundException.class })
+    @ExceptionHandler (value = { NoObservationFoundException.class, UnsupportedVehicleException.class, CityNotFoundException.class, NotAFloatException.class })
     public ResponseEntity<Object> handleCustomExcpetions(RuntimeException exception) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
