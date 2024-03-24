@@ -63,7 +63,7 @@ public class DeliveryService {
             String phenomenon = observation.getPhenomenon().toLowerCase();
             if (phenomenon.contains("snow") || phenomenon.contains("sleet"))
                 WPEF = 1;
-            if (phenomenon.contains("rain"))
+            if (phenomenon.contains("rain") || phenomenon.contains("shower"))
                 WPEF = 0.5;
             if (phenomenon.contains("glaze") || phenomenon.contains("hail") || phenomenon.contains("thunder"))
                 throw new UnsupportedVehicleException("Usage of selected vehicle type is forbidden");
